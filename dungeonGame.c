@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
+
 #define MAP_COL 11
 #define MAP_ROW 11
 enum MOVES
@@ -17,7 +19,7 @@ enum AXIS
     yAxis
 };
 
-int layout1[MAP_ROW][MAP_COL] = {
+int layout_1[MAP_ROW][MAP_COL] = {
 
     {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
@@ -36,9 +38,11 @@ int layout1[MAP_ROW][MAP_COL] = {
 struct map{
     int map[MAP_ROW][MAP_COL];
 };
-struct map base_map; 
-base_map = layout1;
+struct map base_map;
 
+void initializeBaseMap() {
+    memcpy(base_map.map, layout_1, sizeof(layout_1)); // Copy array contents
+}
 struct Player
 {
     // first value coords[0] = {x coords} (horizontal)
@@ -55,7 +59,7 @@ int drawMap()
         for (int col = 0; col < MAP_COL; col++)
         {
 
-            printf("%c ", base_map[row][col]);
+            printf("%c ", base_map.map[row][col]);
         }
         printf("\n");
     }
@@ -138,7 +142,7 @@ int playerMove(char move)
     switch (tolower(move))
     {
     case 'w':
-        if (spaceAvailable(base_map, move_up))
+        if (spaceAvailable(base_map.map, move_up))
         {
             printf("\nsuccess");
         }
@@ -161,11 +165,11 @@ int playerMove(char move)
 
 int main(void)
 {
-
+    initializeBaseMap(); 
     drawMap(base_map, MAP_ROW, MAP_COL);
     whereIsPlayer();
-    playerMove('w');
-    printf("\n\n player x-cord = %d, player y-cord = %d", player.coords[xAxis], player.coords[yAxis]);
+    playerMove('d');
+    printf("\n\nplayer x-cord = %d, player y-cord = %d", player.coords[xAxis], player.coords[yAxis]);
 
     return 0;
 }
