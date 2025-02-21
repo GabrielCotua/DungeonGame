@@ -1,11 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#define COL 11
-#define ROW 11
-enum MOVES {move_up, move_down, move_right, move_left};
+#define MAP_COL 11
+#define MAP_ROW 11
+enum MOVES
+{
+    move_up,
+    move_down,
+    move_right,
+    move_left
+};
 
-int base_map[ROW][COL] = {
+enum AXIS 
+{
+    xAxis,
+    yAxis
+};
+
+int layout1[MAP_ROW][MAP_COL] = {
 
     {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
@@ -21,19 +33,26 @@ int base_map[ROW][COL] = {
 
 };
 
+struct map{
+    int map[MAP_ROW][MAP_COL];
+};
+struct map base_map; 
+base_map = layout1;
+
 struct Player
 {
-    int coord_x;
-    int coord_y;
+    // first value coords[0] = {x coords} (horizontal)
+    // second value coords[1] = {y coords} (vertical)
+    int coords[2]; 
 };
-
 struct Player player;
+
 
 int drawMap()
 {
-    for (int row = 0; row < ROW; row++)
+    for (int row = 0; row < MAP_ROW; row++)
     {
-        for (int col = 0; col < COL; col++)
+        for (int col = 0; col < MAP_COL; col++)
         {
 
             printf("%c ", base_map[row][col]);
@@ -43,95 +62,110 @@ int drawMap()
 
     return 1;
 }
-int playerSpawn(void) {
-
+// TODO: make player spawn in a random location of the map at the beginning
+int playerSpawn(void)
+{
 }
-
+// Looks for the player location in the map
 int whereIsPlayer(void)
 {
 
     int coord_x = -1;
     int coord_y = -1;
-    for (int row = 0; row < ROW; row++)
+    for (int row = 0; row < MAP_ROW; row++)
     {
 
-        for (int col = 0; col < COL; col++)
+        for (int col = 0; col < MAP_COL; col++)
         {
 
-            if (base_map[row][col] == '@')
+            if (base_map.map[row][col] == '@')
             {
                 printf("\nLocation is coord-x %d, coord-y %d\n", row, col);
-                player.coord_x = row;
-                player.coord_y = col;
+                player.coords[xAxis] = row;
+                player.coords[yAxis] = col;
                 return 1;
             }
         }
     }
     return 0;
 }
-int spaceAvailable(int map[ROW][COL], enum MOVES moves)
+/*
+@param int map[MAP_ROW][MAP_COl] required to insert a map that uses the MAP_ROW and MAP_COL dimentions to avoid errors
+@param enum MOVES moves is a enumerator to know where is the player heading to
+*/
+int spaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
 {
-    switch(moves) {
-        case move_up:
-            if(map[player.coord_x][player.coord_y + 1] == ' '){
-                printf("%d = %d is available", move_up, map[player.coord_x][player.coord_y + 1]);
+    switch (moves)
+    {
+    case move_up:
+        if (map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ')
+        {
+            printf("%d = %d is available", move_up, map[player.coords[0]][player.coords[1] + 1]);
         }
         return 1;
 
-        case move_down:
-            if(map[player.coord_x][player.coord_y - 1] == ' '){
-                printf("%d", move_down);
-            }
+    case move_down:
+        if (map[player.coords[xAxis]][player.coords[yAxis] - 1] == ' ')
+        {
+            printf("%d", move_down);
+        }
         return 1;
-        
-        case move_right:
-        if(map[player.coord_x + 1][player.coord_y] == ' '){
+
+    case move_right:
+        if (map[player.coords[xAxis] + 1][player.coords[yAxis]] == ' ')
+        {
             printf("%d", move_right);
         }
         return 1;
-        
-        case move_left:
-        if(map[player.coord_x - 1][player.coord_y] == ' '){
+
+    case move_left:
+        if (map[player.coords[xAxis] - 1][player.coords[yAxis]] == ' ')
+        {
             printf("%d", move_left);
         }
         return 1;
 
-        default:
+    default:
         return 0;
     }
 }
-int playerMove(char move) {
-    switch(tolower(move)) {
-        case 'w':
-            if (spaceAvailable(base_map, move_up)) {
-                printf("\nsuccess");
-            }
-        
-            break;
 
-        case 'a':
-            break;
+/*
+@param move reads user input to where desires to move, takes a character
+*/
+int playerMove(char move)
+{
+    switch (tolower(move))
+    {
+    case 'w':
+        if (spaceAvailable(base_map, move_up))
+        {
+            printf("\nsuccess");
+        }
 
-        case 's':
-            break;
+        break;
 
-        case 'd':
-            break;
+    case 'a':
+        break;
 
-        default:
-            break;
+    case 's':
+        break;
+
+    case 'd':
+        break;
+
+    default:
+        break;
     }
 }
-
-
 
 int main(void)
 {
 
-    drawMap(base_map, ROW, COL);
+    drawMap(base_map, MAP_ROW, MAP_COL);
     whereIsPlayer();
     playerMove('w');
-    printf("\n\n player x-cord = %d, player y-cord = %d", player.coord_x, player.coord_y);
+    printf("\n\n player x-cord = %d, player y-cord = %d", player.coords[xAxis], player.coords[yAxis]);
 
     return 0;
 }
