@@ -68,15 +68,13 @@ int drawMap()
     return 1;
 }
 // TODO: make player spawn in a random location of the map at the beginning
-int playerSpawn(void)
+void playerSpawn(void)
 {
 }
 // Looks for the player location in the map
 int whereIsPlayer(void)
 {
 
-    int coord_x = -1;
-    int coord_y = -1;
     for (int row = 0; row < MAP_ROW; row++)
     {
 
@@ -148,19 +146,19 @@ int playerMove(char move)
             printf("\nsuccess");
         }
 
-        break;
+        return 1;
 
     case 'a':
-        break;
+        return 1;
 
     case 's':
-        break;
+        return 1;
 
     case 'd':
-        break;
+        return 1;
 
     default:
-        break;
+        return 0;
     }
 }
 
@@ -169,7 +167,7 @@ int main(void)
     initializeBaseMap();
     drawMap(base_map, MAP_ROW, MAP_COL);
     whereIsPlayer();
-    playerMove('d');
+    playerMove('w');
     printf("\n\nplayer x-cord = %d, player y-cord = %d", player.coords[xAxis], player.coords[yAxis]);
 
     return 0;
