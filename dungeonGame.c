@@ -13,7 +13,7 @@ enum MOVES
     move_left
 };
 
-enum AXIS 
+enum AXIS
 {
     xAxis,
     yAxis
@@ -35,22 +35,23 @@ int layout_1[MAP_ROW][MAP_COL] = {
 
 };
 
-struct map{
+struct map
+{
     int map[MAP_ROW][MAP_COL];
 };
 struct map base_map;
 
-void initializeBaseMap() {
+void initializeBaseMap()
+{
     memcpy(base_map.map, layout_1, sizeof(layout_1)); // Copy array contents
 }
 struct Player
 {
     // first value coords[0] = {x coords} (horizontal)
     // second value coords[1] = {y coords} (vertical)
-    int coords[2]; 
+    int coords[2];
 };
 struct Player player;
-
 
 int drawMap()
 {
@@ -165,7 +166,7 @@ int playerMove(char move)
 
 int main(void)
 {
-    initializeBaseMap(); 
+    initializeBaseMap();
     drawMap(base_map, MAP_ROW, MAP_COL);
     whereIsPlayer();
     playerMove('d');
