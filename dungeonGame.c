@@ -26,7 +26,7 @@ int layout_1[MAP_ROW][MAP_COL] = {
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
-    {'*', ' ', ' ', ' ', ' ', '@', ' ', ' ', ' ', ' ', '*'},
+    {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
@@ -68,8 +68,14 @@ int drawMap()
     return 1;
 }
 // TODO: make player spawn in a random location of the map at the beginning
+// only execute once.
 void playerSpawn(void)
 {
+
+    int rand_xAxis = (int) ( rand() % 10 ) + 1;
+    int rand_yAxis = (int) ( rand() % 10 ) + 1;
+
+    base_map.map[rand_xAxis][rand_yAxis] = '@';
 }
 // Looks for the player location in the map
 int whereIsPlayer(void)
@@ -166,9 +172,13 @@ int main(void)
 {
     initializeBaseMap();
     drawMap(base_map, MAP_ROW, MAP_COL);
-    whereIsPlayer();
+    playerSpawn();
+    if (whereIsPlayer() == 1) {
+        printf("\nplayer found\n");
+    }
     playerMove('w');
-    printf("\n\nplayer x-cord = %d, player y-cord = %d", player.coords[xAxis], player.coords[yAxis]);
+    printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
+    drawMap(base_map, MAP_ROW, MAP_COL);
 
     return 0;
 }
