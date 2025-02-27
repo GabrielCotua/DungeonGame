@@ -111,33 +111,32 @@ int spaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
     case move_up:
         if (map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ')
         {
-            printf("%d = %d is available\n", move_up, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
-            player.coords[yAxis] = player.coords[yAxis] + 1;
+            printf("%d = %d is available\n", move_right, map[player.coords[xAxis] + 1][player.coords[yAxis] ]);
+            player.coords[xAxis] = player.coords[xAxis] - 1;
         }
         return 1;
 
     case move_down:
         if (map[player.coords[xAxis]][player.coords[yAxis] - 1] == ' ')
         {
-            printf("%d = %d is available\n", move_down, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
-            player.coords[yAxis] = player.coords[yAxis] - 1;
+            printf("%d = %d is available\n", move_left, map[player.coords[xAxis] - 1][player.coords[yAxis]]);
+            player.coords[xAxis] = player.coords[xAxis] + 1;
         }
         return 1;
 
     case move_right:
         if (map[player.coords[xAxis] + 1][player.coords[yAxis]] == ' ')
         {
-            printf("%d = %d is available\n", move_right, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
-            player.coords[xAxis] = player.coords[xAxis] + 1;
+            printf("%d = %d is available\n", move_up, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
+            player.coords[yAxis] = player.coords[yAxis] - 1;
         }
         return 1;
 
     case move_left:
         if (map[player.coords[xAxis] - 1][player.coords[yAxis]] == ' ')
         {
-            printf("%d = %d is available\n", move_left, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
-            player.coords[xAxis] = player.coords[xAxis] - 1;
-
+            printf("%d = %d is available\n", move_down, map[player.coords[xAxis]][player.coords[yAxis] - 1]);
+            player.coords[yAxis] = player.coords[yAxis] + 1;
         }
         return 1;
 
@@ -153,28 +152,28 @@ int drawPlayer(int x, int y, enum MOVES direction) {
 
     switch (tolower(direction))
     {
-    case move_up:
+    case move_left:
 
         base_map.map[x][y-1] = ' ';
         base_map.map[x][y] = '@';
 
         return 1;
 
-    case move_down:
+    case move_right:
 
         base_map.map[x][y+1] = ' ';
         base_map.map[x][y] = '@';
 
         return 1;
 
-    case move_right:
+    case move_down:
     
     base_map.map[x-1][y] = ' ';
     base_map.map[x][y] = '@';
 
         return 1;
 
-    case move_left:
+    case move_up:
     
     base_map.map[x+1][y] = ' ';
     base_map.map[x][y] = '@';
@@ -237,7 +236,7 @@ int main(void)
     playerMove('w');
     printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
     drawMap(base_map, MAP_ROW, MAP_COL);
-    while(scanf("%c", &player_movement)) {
+    while((player_movement = getchar()) != EOF) {
         if (playerMove(tolower(player_movement))) {
             drawMap(base_map, MAP_ROW, MAP_COL);
             
