@@ -56,7 +56,7 @@ struct Player
 struct Player player;
 
 
-int DrawMap();
+int DrawMap(struct map map);
 void PlayerSpawn(void);
 int WhereIsPlayer(void);
 int SpaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves);
@@ -66,17 +66,17 @@ int PlayerMove(char move);
 int main(void)
 {
     InitializeBaseMap();
-    DrawMap(base_map, MAP_ROW, MAP_COL);
+    DrawMap(base_map);
     PlayerSpawn();
     if (WhereIsPlayer() == 1) {
         printf("\nplayer found\n");
     }
     PlayerMove('w');
     printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
-    DrawMap(base_map, MAP_ROW, MAP_COL);
-    while((player_movement = getchar()) != EOF) {
+    DrawMap(base_map);
+    while( (player_movement = getchar()) != EOF ) {
         if (PlayerMove(tolower(player_movement))) {
-            DrawMap(base_map, MAP_ROW, MAP_COL);
+            DrawMap(base_map);
             
         }
     }
@@ -84,14 +84,14 @@ int main(void)
     return 0;
 }
 
-int DrawMap()
+int DrawMap(struct map map)
 {
     for (int row = 0; row < MAP_ROW; row++)
     {
         for (int col = 0; col < MAP_COL; col++)
         {
 
-            printf("%c ", base_map.map[row][col]);
+            printf("%c ", map.map[row][col]);
         }
         printf("\n");
     }
