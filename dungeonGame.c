@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 
+#define FLUSH while (getchar() != '\n')
 #define MAP_COL 11
 #define MAP_ROW 11
 char player_movement;
@@ -104,12 +105,13 @@ int whereIsPlayer(void)
 @param int map[MAP_ROW][MAP_COl] required to insert a map that uses the MAP_ROW and MAP_COL dimentions to avoid errors
 @param enum MOVES moves is a enumerator to know where is the player heading to
 */
+
 int spaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
 {
     switch (moves)
     {
     case move_up:
-        if (map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ')
+        if ((map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ') && (map[player.coords[xAxis]][player.coords[yAxis] + 1] != '*'))
         {
             printf("%d = %d is available\n", move_right, map[player.coords[xAxis] + 1][player.coords[yAxis] ]);
             player.coords[xAxis] = player.coords[xAxis] - 1;
@@ -148,6 +150,7 @@ int spaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
 /*
 @param move reads user input to where desires to move, takes a character
 */
+
 int drawPlayer(int x, int y, enum MOVES direction) {
 
     switch (tolower(direction))
@@ -237,6 +240,7 @@ int main(void)
     printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
     drawMap(base_map, MAP_ROW, MAP_COL);
     while((player_movement = getchar()) != EOF) {
+        FLUSH;
         if (playerMove(tolower(player_movement))) {
             drawMap(base_map, MAP_ROW, MAP_COL);
             
