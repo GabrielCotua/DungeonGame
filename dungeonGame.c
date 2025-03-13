@@ -7,7 +7,6 @@
 #define FLUSH while (getchar() != '\n')
 #define MAP_COL 11
 #define MAP_ROW 11
-char player_movement;
 enum MOVES
 {
     move_up,
@@ -20,6 +19,12 @@ enum AXIS
 {
     yAxis,
     xAxis
+};
+
+enum MAP_VERSION 
+{
+    mapVer_base_map,
+    mapVer_maze_map
 };
 struct map
 {
@@ -42,6 +47,22 @@ struct map base_map = {
     }
 };
 
+struct map maze_map = {
+    .map = {
+        {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
+        {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*', '*', '*'},
+        {'*', '*', '*', '*', '*', '*', '*', ' ', ' ', ' ', '*'},
+        {'*', ' ', ' ', ' ', ' ', ' ', ' ', '*', '*', ' ', '*'},
+        {'*', ' ', '*', '*', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
+        {'*', ' ', ' ', '*', ' ', ' ', ' ', '*', '*', '*', '*'},
+        {'*', ' ', ' ', '*', ' ', ' ', ' ', '*', ' ', ' ', '*'},
+        {'*', ' ', '*', '*', '*', '*', ' ', '*', '*', ' ', '*'},
+        {'*', ' ', '*', ' ', ' ', '*', '*', '*', '*', ' ', '*'},
+        {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
+        {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'}
+    }
+};
+
 struct Player
 {
     // first value coords[0] = {x coords} (horizontal)
@@ -51,42 +72,67 @@ struct Player
 struct Player player;
 
 
-int DrawMap(struct map map[MAP_ROW][MAP_COL]);
-void PlayerSpawn(void);
-int WhereIsPlayer(void);
-int SpaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves);
-int DrawPlayer(int x, int y, enum MOVES direction);
-int PlayerMove(char move);
+int DrawMap(struct map map);
+void PlayerSpawn(struct map * map);
+int WhereIsPlayer(struct map map);
+int SpaceAvailable(struct map * map, enum MOVES moves);
+int DrawPlayer(int x, int y, enum MOVES direction, struct map * map);
+int PlayerMove(char move, struct map * map);
 
 int main(void)
 {
-    InitializeBaseMap();
-    DrawMap(base_map.map);
-    PlayerSpawn();
-    if (WhereIsPlayer() == 1) {
-        printf("\nplayer found\n");
-    }
-    PlayerMove('w');
-    printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
-    DrawMap(base_map.map);
-    while( (player_movement = getchar()) != EOF ) {
-        if (PlayerMove(tolower(player_movement))) {
-            DrawMap(base_map.map);
-            
-        }
-    }
+    char player_movement;
+    int mapChosen;
+    printf("What kind of map would you like to use?\
+        \n0 - Base Map\
+        \n1 - Maze Map\n");   
+    scanf("%d", &mapChosen);
+    switch (mapChosen)        
+    {
+        case(mapVer_base_map):
+            PlayerSpawn(&base_map);
+            DrawMap(base_map);
+            if (WhereIsPlayer(base_map)) {
+                printf("\nplayer found\n");
+            }
+            printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
+            while( (player_movement = getchar()) != EOF ) {
+                if (PlayerMove(tolower(player_movement), &base_map)) {
+                    DrawMap(base_map);
+                    
+                }
+            }
+            return 1;
 
-    return 0;
+        case(mapVer_maze_map):
+            PlayerSpawn(&maze_map);
+            DrawMap(maze_map);
+            if (WhereIsPlayer(maze_map)) {
+                printf("\nplayer found\n");
+            }
+            printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
+            while( (player_movement = getchar()) != EOF ) {
+                if (PlayerMove(tolower(player_movement), &maze_map)) {
+                    DrawMap(maze_map);
+                    
+                }
+            }
+            return 1;
+
+        default:
+        printf("not a valid option");
+        return 0;
+    }
 }
 
-int DrawMap(struct map map[MAP_ROW][MAP_COL])
+int DrawMap(struct map map)
 {
     for (int row = 0; row < MAP_ROW; row++)
     {
         for (int col = 0; col < MAP_COL; col++)
         {
 
-            printf("%c ", map[row][col]);
+            printf("%c ", map.map[row][col]);
         }
         printf("\n");
     }
@@ -96,17 +142,25 @@ int DrawMap(struct map map[MAP_ROW][MAP_COL])
 
 // TODO: make player spawn in a random location of the map at the beginning
 // only execute once.
-void PlayerSpawn(void)
+int GetRandomCoords(int colRow )
 {
     srand(time(0));
-    int rand_xAxis = (int) ( rand() % MAP_ROW - 2 ) + 1;
-    int rand_yAxis = (int) ( rand() % MAP_COL - 2 ) + 1;
+    return (int) ( rand() % colRow - 2 ) + 1;
+}
+void PlayerSpawn(struct map * map)
+{
+    int rand_xAxis = GetRandomCoords(MAP_ROW);
+    int rand_yAxis = GetRandomCoords(MAP_COL);
+    while ( map->map[rand_xAxis][rand_yAxis] == '*' ) {
+        rand_xAxis = GetRandomCoords(MAP_ROW);
+        rand_yAxis = GetRandomCoords(MAP_COL);
+    }
+    map->map[rand_xAxis][rand_yAxis] = '@';
 
-    base_map.map[rand_xAxis][rand_yAxis] = '@';
 }
 
 // Looks for the player location in the map
-int WhereIsPlayer(void)
+int WhereIsPlayer(struct map map)
 {
 
     for (int row = 0; row < MAP_ROW; row++)
@@ -115,7 +169,7 @@ int WhereIsPlayer(void)
         for (int col = 0; col < MAP_COL; col++)
         {
 
-            if (base_map.map[row][col] == '@')
+            if (map.map[row][col] == '@')
             {
                 printf("\nLocation is coord-x %d, coord-y %d\n", row, col);
                 player.coords[xAxis] = row;
@@ -131,38 +185,38 @@ int WhereIsPlayer(void)
 @param enum MOVES moves is a enumerator to know where is the player heading to
 */
 
-int SpaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
+int SpaceAvailable(struct map * map, enum MOVES moves)
  {
      switch (moves)
      {
      case move_up:
-         if (map[player.coords[xAxis] - 1][player.coords[yAxis]] == ' ')
+         if (map->map[player.coords[xAxis] - 1][player.coords[yAxis]] == ' ')
          {
-             printf("%d = %d is available\n", move_right, map[player.coords[xAxis] + 1][player.coords[yAxis] ]);
+             printf("%d = %d is available\n", move_right, map->map[player.coords[xAxis] + 1][player.coords[yAxis] ]);
              player.coords[xAxis] = player.coords[xAxis] - 1;
          }
          return 1;
  
      case move_down:
-         if (map[player.coords[xAxis] + 1][player.coords[yAxis]] == ' ')
+         if (map->map[player.coords[xAxis] + 1][player.coords[yAxis]] == ' ')
          {
-             printf("%d = %d is available\n", move_left, map[player.coords[xAxis] - 1][player.coords[yAxis]]);
+             printf("%d = %d is available\n", move_left, map->map[player.coords[xAxis] - 1][player.coords[yAxis]]);
              player.coords[xAxis] = player.coords[xAxis] + 1;
          }
          return 1;
  
      case move_right:
-         if (map[player.coords[xAxis]][player.coords[yAxis] - 1] == ' ')
+         if (map->map[player.coords[xAxis]][player.coords[yAxis] - 1] == ' ')
          {
-             printf("%d = %d is available\n", move_up, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
+             printf("%d = %d is available\n", move_up, map->map[player.coords[xAxis]][player.coords[yAxis] + 1]);
              player.coords[yAxis] = player.coords[yAxis] - 1;
          }
          return 1;
  
      case move_left:
-         if (map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ')
+         if (map->map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ')
          {
-             printf("%d = %d is available\n", move_down, map[player.coords[xAxis]][player.coords[yAxis] - 1]);
+             printf("%d = %d is available\n", move_down, map->map[player.coords[xAxis]][player.coords[yAxis] - 1]);
              player.coords[yAxis] = player.coords[yAxis] + 1;
          }
          return 1;
@@ -176,35 +230,35 @@ int SpaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
 @param move reads user input to where desires to move, takes a character
 */
 
-int DrawPlayer(int x, int y, enum MOVES direction) {
+int DrawPlayer(int x, int y, enum MOVES direction, struct map * map) {
 
     switch (tolower(direction))
     {
     case move_left:
 
-        base_map.map[x][y-1] = ' ';
-        base_map.map[x][y] = '@';
+        map->map[x][y-1] = ' ';
+        map->map[x][y] = '@';
 
         return 1;
 
     case move_right:
 
-        base_map.map[x][y+1] = ' ';
-        base_map.map[x][y] = '@';
+        map->map[x][y+1] = ' ';
+        map->map[x][y] = '@';
 
         return 1;
 
     case move_down:
     
-    base_map.map[x-1][y] = ' ';
-    base_map.map[x][y] = '@';
+        map->map[x-1][y] = ' ';
+        map->map[x][y] = '@';
 
         return 1;
 
     case move_up:
     
-    base_map.map[x+1][y] = ' ';
-    base_map.map[x][y] = '@';
+        map->map[x+1][y] = ' ';
+        map->map[x][y] = '@';
 
         return 1;
 
@@ -214,36 +268,36 @@ int DrawPlayer(int x, int y, enum MOVES direction) {
 
 }
 
-int PlayerMove(char move)
+int PlayerMove(char move, struct map * map)
 {
     switch (tolower(move))
     {
     case 'w':
-        if (SpaceAvailable(base_map.map, move_up))
+        if (SpaceAvailable(map, move_up))
         {
-            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_up);
+            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_up, map);
         }
 
         return 1;
 
     case 'a':
-        if (SpaceAvailable(base_map.map, move_right))
+        if (SpaceAvailable(map, move_right))
         {
-            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_right);
+            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_right, map);
         }
         return 1;
 
     case 's':
-        if (SpaceAvailable(base_map.map, move_down))
+        if (SpaceAvailable(map, move_down))
         {
-            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_down);
+            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_down, map);
         }
         return 1;
 
     case 'd':
-        if (SpaceAvailable(base_map.map, move_left))
+        if (SpaceAvailable(map, move_left))
         {
-            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_left);
+            DrawPlayer(player.coords[xAxis], player.coords[yAxis], move_left, map);
         }
         return 1;
 
