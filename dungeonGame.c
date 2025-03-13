@@ -21,9 +21,13 @@ enum AXIS
     yAxis,
     xAxis
 };
+struct map
+{
+    int map[MAP_ROW][MAP_COL];
+};
 
-int layout_1[MAP_ROW][MAP_COL] = {
-
+struct map base_map = {
+    .map = {
     {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
@@ -35,19 +39,9 @@ int layout_1[MAP_ROW][MAP_COL] = {
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '*'},
     {'*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'}
-
+    }
 };
 
-struct map
-{
-    int map[MAP_ROW][MAP_COL];
-};
-struct map base_map;
-
-void InitializeBaseMap()
-{
-    memcpy(base_map.map, layout_1, sizeof(layout_1)); // Copy array contents
-}
 struct Player
 {
     // first value coords[0] = {x coords} (horizontal)
@@ -57,7 +51,7 @@ struct Player
 struct Player player;
 
 
-int DrawMap(struct map map);
+int DrawMap(struct map map[MAP_ROW][MAP_COL]);
 void PlayerSpawn(void);
 int WhereIsPlayer(void);
 int SpaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves);
@@ -67,17 +61,17 @@ int PlayerMove(char move);
 int main(void)
 {
     InitializeBaseMap();
-    DrawMap(base_map);
+    DrawMap(base_map.map);
     PlayerSpawn();
     if (WhereIsPlayer() == 1) {
         printf("\nplayer found\n");
     }
     PlayerMove('w');
     printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
-    DrawMap(base_map);
+    DrawMap(base_map.map);
     while( (player_movement = getchar()) != EOF ) {
         if (PlayerMove(tolower(player_movement))) {
-            DrawMap(base_map);
+            DrawMap(base_map.map);
             
         }
     }
@@ -85,14 +79,14 @@ int main(void)
     return 0;
 }
 
-int DrawMap(struct map map)
+int DrawMap(struct map map[MAP_ROW][MAP_COL])
 {
     for (int row = 0; row < MAP_ROW; row++)
     {
         for (int col = 0; col < MAP_COL; col++)
         {
 
-            printf("%c ", map.map[row][col]);
+            printf("%c ", map[row][col]);
         }
         printf("\n");
     }
