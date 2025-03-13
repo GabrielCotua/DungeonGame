@@ -105,8 +105,8 @@ int DrawMap(struct map map)
 void PlayerSpawn(void)
 {
     srand(time(0));
-    int rand_xAxis = (int) ( rand() % 9 ) + 1;
-    int rand_yAxis = (int) ( rand() % 9 ) + 1;
+    int rand_xAxis = (int) ( rand() % MAP_ROW - 2 ) + 1;
+    int rand_yAxis = (int) ( rand() % MAP_COL - 2 ) + 1;
 
     base_map.map[rand_xAxis][rand_yAxis] = '@';
 }
@@ -137,52 +137,52 @@ int WhereIsPlayer(void)
 @param enum MOVES moves is a enumerator to know where is the player heading to
 */
 
-int spaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
-{
-    switch (moves)
-    {
-    case move_up:
-        if ((map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ') && (map[player.coords[xAxis]][player.coords[yAxis] + 1] != '*'))
-        {
-            printf("%d = %d is available\n", move_right, map[player.coords[xAxis] + 1][player.coords[yAxis] ]);
-            player.coords[xAxis] = player.coords[xAxis] - 1;
-        }
-        return 1;
-
-    case move_down:
-        if (map[player.coords[xAxis] + 1][player.coords[yAxis]] == ' ')
-        {
-            printf("%d = %d is available\n", move_left, map[player.coords[xAxis] - 1][player.coords[yAxis]]);
-            player.coords[xAxis] = player.coords[xAxis] + 1;
-        }
-        return 1;
-
-    case move_right:
-        if (map[player.coords[xAxis]][player.coords[yAxis] - 1] == ' ')
-        {
-            printf("%d = %d is available\n", move_up, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
-            player.coords[yAxis] = player.coords[yAxis] - 1;
-        }
-        return 1;
-
-    case move_left:
-        if (map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ')
-        {
-            printf("%d = %d is available\n", move_down, map[player.coords[xAxis]][player.coords[yAxis] - 1]);
-            player.coords[yAxis] = player.coords[yAxis] + 1;
-        }
-        return 1;
-
-    default:
-        return 0;
-    }
-}
+int SpaceAvailable(int map[MAP_ROW][MAP_COL], enum MOVES moves)
+ {
+     switch (moves)
+     {
+     case move_up:
+         if (map[player.coords[xAxis] - 1][player.coords[yAxis]] == ' ')
+         {
+             printf("%d = %d is available\n", move_right, map[player.coords[xAxis] + 1][player.coords[yAxis] ]);
+             player.coords[xAxis] = player.coords[xAxis] - 1;
+         }
+         return 1;
+ 
+     case move_down:
+         if (map[player.coords[xAxis] + 1][player.coords[yAxis]] == ' ')
+         {
+             printf("%d = %d is available\n", move_left, map[player.coords[xAxis] - 1][player.coords[yAxis]]);
+             player.coords[xAxis] = player.coords[xAxis] + 1;
+         }
+         return 1;
+ 
+     case move_right:
+         if (map[player.coords[xAxis]][player.coords[yAxis] - 1] == ' ')
+         {
+             printf("%d = %d is available\n", move_up, map[player.coords[xAxis]][player.coords[yAxis] + 1]);
+             player.coords[yAxis] = player.coords[yAxis] - 1;
+         }
+         return 1;
+ 
+     case move_left:
+         if (map[player.coords[xAxis]][player.coords[yAxis] + 1] == ' ')
+         {
+             printf("%d = %d is available\n", move_down, map[player.coords[xAxis]][player.coords[yAxis] - 1]);
+             player.coords[yAxis] = player.coords[yAxis] + 1;
+         }
+         return 1;
+ 
+     default:
+         return 0;
+     }
+ }
 
 /*
 @param move reads user input to where desires to move, takes a character
 */
 
-int drawPlayer(int x, int y, enum MOVES direction) {
+int DrawPlayer(int x, int y, enum MOVES direction) {
 
     switch (tolower(direction))
     {
@@ -257,26 +257,4 @@ int PlayerMove(char move)
 
         return 0;
     }
-}
-
-int main(void)
-{
-    initializeBaseMap();
-    drawMap(base_map, MAP_ROW, MAP_COL);
-    playerSpawn();
-    if (whereIsPlayer() == 1) {
-        printf("\nplayer found\n");
-    }
-    playerMove('w');
-    printf("\n\nplayer x-cord = %d, player y-cord = %d\n", player.coords[xAxis], player.coords[yAxis]);
-    drawMap(base_map, MAP_ROW, MAP_COL);
-    while((player_movement = getchar()) != EOF) {
-        FLUSH;
-        if (playerMove(tolower(player_movement))) {
-            drawMap(base_map, MAP_ROW, MAP_COL);
-            
-        }
-    }
-
-    return 0;
 }
