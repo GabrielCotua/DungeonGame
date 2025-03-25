@@ -26,6 +26,12 @@ enum MAP_VERSION
     mapVer_base_map,
     mapVer_maze_map
 };
+
+enum ITEM_OPTIONS
+{
+    item_point_plus,
+    item_point_minus
+};
 struct map
 {
     int map[MAP_ROW][MAP_COL];
@@ -68,13 +74,32 @@ struct Player
     // first value coords[0] = {x coords} (horizontal)
     // second value coords[1] = {y coords} (vertical)
     int coords[2];
+    char sprite;
 };
-struct Player player;
+struct Player player = {
+    .sprite = '@'
+};
+
+struct item 
+{
+    // first value coords[0] = {x coords} (horizontal)
+    // second value coords[1] = {y coords} (vertical)   
+    int corrds[2];
+    enum ITEM_OPTIONS item_value;
+    char sprite;
+};
+
+struct item money = {
+    .corrds = {1,1},
+    .item_value = item_point_plus,
+    .sprite = '$'
+
+};
 
 
 int DrawMap(struct map map);
-void PlayerSpawn(struct map * map);
-int WhereIsPlayer(struct map map);
+void PlayerSpawn(struct map * map, struct Player player);
+int WhereIsPlayer(struct map map, struct Player player);
 int SpaceAvailable(struct map * map, enum MOVES moves);
 int DrawPlayer(int x, int y, enum MOVES direction, struct map * map);
 int PlayerMove(char move, struct map * map);
@@ -147,7 +172,7 @@ int GetRandomCoords(int colRow )
     srand(time(0));
     return (int) ( rand() % colRow - 2 ) + 1;
 }
-void PlayerSpawn(struct map * map)
+void PlayerSpawn(struct map * map, struct Player player)
 {
     int rand_xAxis = GetRandomCoords(MAP_ROW);
     int rand_yAxis = GetRandomCoords(MAP_COL);
@@ -155,12 +180,12 @@ void PlayerSpawn(struct map * map)
         rand_xAxis = GetRandomCoords(MAP_ROW);
         rand_yAxis = GetRandomCoords(MAP_COL);
     }
-    map->map[rand_xAxis][rand_yAxis] = '@';
+    map->map[rand_xAxis][rand_yAxis] = player.sprite;
 
 }
 
 // Looks for the player location in the map
-int WhereIsPlayer(struct map map)
+int WhereIsPlayer(struct map map, struct Player player)
 {
 
     for (int row = 0; row < MAP_ROW; row++)
@@ -169,7 +194,7 @@ int WhereIsPlayer(struct map map)
         for (int col = 0; col < MAP_COL; col++)
         {
 
-            if (map.map[row][col] == '@')
+            if (map.map[row][col] == player.sprite)
             {
                 printf("\nLocation is coord-x %d, coord-y %d\n", row, col);
                 player.coords[xAxis] = row;
@@ -230,14 +255,14 @@ int SpaceAvailable(struct map * map, enum MOVES moves)
 @param move reads user input to where desires to move, takes a character
 */
 
-int DrawPlayer(int x, int y, enum MOVES direction, struct map * map) {
+int DrawPlayer(int x, int y, enum MOVES direction, struct map * map, struct Player player) {
 
     switch (tolower(direction))
     {
     case move_left:
 
         map->map[x][y-1] = ' ';
-        map->map[x][y] = '@';
+        map->map[x][y] = player.sprite;
 
         return 1;
 
