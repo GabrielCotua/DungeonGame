@@ -8,7 +8,7 @@ CFLAGS = -Wall -Wextra -Werror -std=c11
 TARGET = game
 
 # Source files
-SRCS = dungeonGame.c
+SRCS = dungeonGameUI.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)
@@ -18,7 +18,7 @@ all: $(TARGET)
 
 # Linking step
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) -lncurses
 
 # Compile .c files into .o files
 %.o: %.c
