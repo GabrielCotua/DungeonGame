@@ -57,11 +57,11 @@ int main(void) {
         int ch = getch();
         if (ch == 'q') break;
 
-        switch (ch) {
-            case KEY_UP:    PlayerMove(move_up, &base_map, &player); break;
-            case KEY_DOWN:  PlayerMove(move_down, &base_map, &player); break;
-            case KEY_LEFT:  PlayerMove(move_left, &base_map, &player); break;
-            case KEY_RIGHT: PlayerMove(move_right, &base_map, &player); break;
+        switch (tolower(ch)) {
+            case 'w':  PlayerMove(move_up, &base_map, &player); break;
+            case 's':  PlayerMove(move_down, &base_map, &player); break;
+            case 'a':  PlayerMove(move_left, &base_map, &player); break;
+            case 'd':  PlayerMove(move_right, &base_map, &player); break;
         }
     }
 
